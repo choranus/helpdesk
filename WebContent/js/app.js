@@ -1,75 +1,75 @@
-var taskManagerModule = angular.module('taskManagerApp', ['ngAnimate']);
+var ticketManagerModule = angular.module('ticketManagerApp', ['ngAnimate']);
 
-taskManagerModule.controller('taskManagerController', function ($scope,$http) {
+ticketManagerModule.controller('ticketManagerController', function ($scope,$http) {
 	
-	var urlBase="http://localhost:8080/TaskManagerApp";
+	var urlBase="http://localhost:8080/TicketManagerApp";// URL
 	$scope.toggle=true;
 	$scope.selection = [];
 	$scope.statuses=['ACTIVE','COMPLETED'];
 	$scope.priorities=['HIGH','LOW','MEDIUM'];
 	$http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 	
-	//get all tasks and display initially
-	$http.get(urlBase+'/tasks').
+	//get all issues and display initially
+	$http.get(urlBase+'/tickets').
     	success(function(data) {
-	        $scope.tasks = data;
-	        for(var i=0;i<$scope.tasks.length;i++){
-	            if($scope.tasks[i].taskStatus=='COMPLETED'){
-	           	 $scope.selection.push($scope.tasks[i].taskId);
+	        $scope.tickets = data;
+	        for(var i=0;i<$scope.tickets.length;i++){
+	            if($scope.tickets[i].ticketStatus=='COMPLETED'){
+	           	 $scope.selection.push($scope.tickets[i].ticketId);
 	        }
 	        }
     });
 	
-	//add a new task
-	$scope.addTask = function addTask() {
-		if($scope.taskName=="" || $scope.taskDesc=="" || $scope.taskPriority == "" || $scope.taskStatus == ""){
-			alert("Insufficient Data! Please provide values for task name, description, priortiy and status");
+	//add a new Isssue
+	$scope.addTicket = function addTicket() {
+		if($scope.ticketName=="" || $scope.ticketDesc=="" || $scope.ticketPriority == "" || $scope.ticketStatus == ""){
+			alert("Insufficient Data! Please provide values for ticket name, description, priortiy and status");
 		}
 		else{
-		 $http.post(urlBase + '/tasks/insert/' +$scope.taskName+'/'+$scope.taskDesc+'/'+$scope.taskPriority+'/'+$scope.taskStatus).
+		 $http.post(urlBase + '/tickets/insert/' +$scope.ticketName+'/'+$scope.ticketDesc+'/'+$scope.ticketPriority+'/'+$scope.ticketStatus).
 		  success(function(data) {
-			 alert("Task added");
-			 $scope.tasks = data;	
-			 $scope.taskName="";
-			 $scope.taskDesc="";
-			 $scope.taskPriority="";
-			 $scope.taskStatus="";
+			 alert("Ticket added");
+			 $scope.tickets = data;	
+			 $scope.ticketName="";
+			 $scope.ticketDesc="";
+			 $scope.ticketPriority="";
+			 $scope.ticketStatus="";
 			 $scope.toggle='!toggle';			 
 		    });
 		}
 	};
 		
-	// toggle selection for a given task by task id
-	  $scope.toggleSelection = function toggleSelection(taskId) {
-	    var idx = $scope.selection.indexOf(taskId);
+	// toggle selection for a given ticket by ticket id
+	  $scope.toggleSelection = function toggleSelection(ticketId) {
+	    var idx = $scope.selection.indexOf(ticketId);
 
 	    // is currently selected
 	    if (idx > -1) {
-	      $http.post(urlBase + '/tasks/' +taskId+'/ACTIVE').
+	      $http.post(urlBase + '/tickets/' +ticketId+'/ACTIVE').
 		  success(function(data) {
-			 alert("Task unmarked");
-			 $scope.tasks = data;		       
+			 alert("Ticket unmarked");
+			 $scope.tickets = data;		       
 		    });
 	      $scope.selection.splice(idx, 1);
 	    }
 
 	    // is newly selected
 	    else {
-	      $http.post(urlBase + '/tasks/' +taskId+'/COMPLETED').
+	      $http.post(urlBase + '/tickets/' +ticketId+'/COMPLETED').
 		  success(function(data) {
-			 alert("Task marked completed");
-			 $scope.tasks = data;
+			 alert("Ticket marked completed");
+			 $scope.tickets = data;
 		    });
-	      $scope.selection.push(taskId);
+	      $scope.selection.push(ticketId);
 	    }
 	  };
 	  
 	
-	// Archive Completed Tasks
-	  $scope.archiveTasks = function archiveTasks() {
-		  $http.post(urlBase + '/tasks/archive/' + $scope.selection).
+	// Archive Completed Tickets
+	  $scope.archiveTickets = function archiveTickets() {
+		  $http.post(urlBase + '/tickets/archive/' + $scope.selection).
 		  success(function(data) {
-			  $scope.tasks = data;
+			  $scope.tickets = data;
 		       alert("Successfully Archived");
 		    });
 	  };
@@ -77,11 +77,11 @@ taskManagerModule.controller('taskManagerController', function ($scope,$http) {
 });
 
 //Angularjs Directive for confirm dialog box
-taskManagerModule.directive('ngConfirmClick', [
+ticketManagerModule.directive('ngConfirmClick', [
 	function(){
          return {
              link: function (scope, element, attr) {
-                 var msg = attr.ngConfirmClick || "Are you sure?";
+                 var msg = attr.ngConfirmClick || "Are you sure want to remove this issue ?";
                  var clickAction = attr.confirmedClick;
                  element.bind('click',function (event) {
                      if ( window.confirm(msg) ) {
